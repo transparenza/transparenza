@@ -31,16 +31,38 @@ contract ReviewTest is Test {
     function test_commentERC20() public {
         vm.prank(alice);
         review.commentERC20(address(mockERC20), "cid", "pOPId");
+        assertEq(review.accountReviewedToken(address(mockERC20), alice), true);
+        assertEq(review.counter(alice), 1);
     }
 
     function test_commentERC721() public {
         vm.prank(alice);
         review.commentERC721(address(mockERC721), "cid", "pOPId");
+        assertEq(review.accountReviewedToken(address(mockERC721), alice), true);
+        assertEq(review.counter(alice), 1);
     }
 
     function test_commentERC1155() public {
         vm.prank(alice);
         review.commentERC1155(address(mockERC1155), 0, "cid", "pOPId");
+        assertEq(review.accountReviewed1155(address(mockERC1155), 0, alice), true);
+        assertEq(review.counter(alice), 1);
+    }
+
+    function test_RevertWhen_DoubleOpinionToken() public {
+        vm.startPrank(alice);
+        review.commentERC20(address(mockERC20), "cid", "pOPId");
+        vm.expectRevert("Already commented");
+        review.commentERC20(address(mockERC20), "cid", "pOPId");
+        vm.stopPrank();
+    }
+
+    function test_RevertWhen_DoubleOpinion1155() public {
+        vm.startPrank(alice);
+        review.commentERC1155(address(mockERC1155), 0, "cid", "pOPId");
+        vm.expectRevert("Already commented");
+        review.commentERC1155(address(mockERC1155), 0, "cid", "pOPId");
+        vm.stopPrank();
     }
 
     function test_RevertWhen_NotHolder() public {
