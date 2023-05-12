@@ -16,7 +16,9 @@ contract ReviewTest is Test {
 
     Review public review;
 
-    event TransferSingle(address indexed operator, address indexed from, address indexed to, uint256 id, uint256 value);
+    event CommentERC20(address indexed token, address indexed sender, string cid);
+    event CommentERC721(address indexed token, address indexed sender, string cid);
+    event CommentERC1155(address indexed token, uint256 indexed id, address indexed sender, string cid);
 
     function setUp() public {
         mockERC20 = new MockERC20();
@@ -29,6 +31,8 @@ contract ReviewTest is Test {
     }
 
     function test_commentERC20() public {
+        vm.expectEmit(true, true, true, true);
+        emit CommentERC20(address(mockERC20), alice, "cid");
         vm.prank(alice);
         review.commentERC20(address(mockERC20), "cid", "pOPId");
         assertEq(review.accountReviewedToken(address(mockERC20), alice), true);
@@ -36,6 +40,8 @@ contract ReviewTest is Test {
     }
 
     function test_commentERC721() public {
+        vm.expectEmit(true, true, true, true);
+        emit CommentERC721(address(mockERC721), alice, "cid");
         vm.prank(alice);
         review.commentERC721(address(mockERC721), "cid", "pOPId");
         assertEq(review.accountReviewedToken(address(mockERC721), alice), true);
@@ -43,9 +49,11 @@ contract ReviewTest is Test {
     }
 
     function test_commentERC1155() public {
+        vm.expectEmit(true, true, true, true);
+        emit CommentERC1155(address(mockERC1155), 0, alice, "cid");
         vm.prank(alice);
         review.commentERC1155(address(mockERC1155), 0, "cid", "pOPId");
-        assertEq(review.accountReviewed1155(address(mockERC1155), 0, alice), true);
+        assertEq(review.accountReviewedERC1155(address(mockERC1155), 0, alice), true);
         assertEq(review.counter(alice), 1);
     }
 
