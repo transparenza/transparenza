@@ -6,7 +6,6 @@ import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import {IERC721} from "openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
 import {IERC1155} from "openzeppelin-contracts/contracts/token/ERC1155/IERC1155.sol";
 import {IERC165} from "forge-std/interfaces/IERC165.sol";
-import "forge-std/console.sol";
 
 contract Review {
     /// Token => EOA => hasCommented
