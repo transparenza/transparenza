@@ -137,6 +137,7 @@ contract Review {
             chainId := chainid()
         }
 
+        /// Only works in Polygon chain currently
         if (chainId == 137) {
             // First, we make sure this person hasn't done this before
             if (nullifierHashes[nullifierHash]) revert InvalidNullifier();
