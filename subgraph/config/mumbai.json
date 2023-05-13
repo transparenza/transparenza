@@ -1,7 +1,7 @@
 {
     "network": "mumbai",
     "token": {
-        "address": "0x3af10c9c65F627b71dF7003022528b35E049Aee4",
-        "startBlock": 35519194
+        "address": "0x5df2bb9020b3e6aa3d6543376477ac29d3ee5312",
+        "startBlock": 35547602
     }
 }
