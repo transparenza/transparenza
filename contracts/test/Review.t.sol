@@ -6,15 +6,21 @@ import "src/Review.sol";
 import "src/tokens/MockERC20.sol";
 import "src/tokens/MockERC721.sol";
 import "src/tokens/MockERC1155.sol";
+import {TypeConverter} from "./helpers/TypeConverter.sol";
 
 contract ReviewTest is Test {
     address public alice = address(1);
+    address public signal = address(3);
+    uint256 public root = 0;
+    uint256 public nullifierHash = 1;
+    uint256[8] public proof = [0, 1, 2, 3, 4, 5, 6, 7];
 
     MockERC20 public mockERC20;
     MockERC721 public mockERC721;
     MockERC1155 public mockERC1155;
 
     Review public review;
+    IWorldID public worldID;
 
     event CommentERC20(address indexed token, address indexed sender, string cid);
     event CommentERC721(address indexed token, address indexed sender, string cid);
@@ -27,14 +33,17 @@ contract ReviewTest is Test {
         mockERC721.mint(0, alice);
         mockERC1155 = new MockERC1155();
         mockERC1155.mint(0, alice);
-        review = new Review();
+
+        worldID = IWorldID(address(25));
+
+        review = new Review(worldID, "app_1234", "wid_test");
     }
 
     function test_commentERC20() public {
         vm.expectEmit(true, true, true, true);
         emit CommentERC20(address(mockERC20), alice, "cid");
         vm.prank(alice);
-        review.commentERC20(address(mockERC20), "cid", "pOPId");
+        review.commentERC20(address(mockERC20), "cid", signal, root, nullifierHash, proof);
         assertEq(review.accountReviewedToken(address(mockERC20), alice), true);
         assertEq(review.counter(alice), 1);
     }
@@ -43,7 +52,7 @@ contract ReviewTest is Test {
         vm.expectEmit(true, true, true, true);
         emit CommentERC721(address(mockERC721), alice, "cid");
         vm.prank(alice);
-        review.commentERC721(address(mockERC721), "cid", "pOPId");
+        review.commentERC721(address(mockERC721), "cid", signal, root, nullifierHash, proof);
         assertEq(review.accountReviewedToken(address(mockERC721), alice), true);
         assertEq(review.counter(alice), 1);
     }
@@ -52,30 +61,30 @@ contract ReviewTest is Test {
         vm.expectEmit(true, true, true, true);
         emit CommentERC1155(address(mockERC1155), 0, alice, "cid");
         vm.prank(alice);
-        review.commentERC1155(address(mockERC1155), 0, "cid", "pOPId");
+        review.commentERC1155(address(mockERC1155), 0, "cid", signal, root, nullifierHash, proof);
         assertEq(review.accountReviewedERC1155(address(mockERC1155), 0, alice), true);
         assertEq(review.counter(alice), 1);
     }
 
     function test_RevertWhen_DoubleOpinionToken() public {
         vm.startPrank(alice);
-        review.commentERC20(address(mockERC20), "cid", "pOPId");
+        review.commentERC20(address(mockERC20), "cid", signal, root, nullifierHash, proof);
         vm.expectRevert("Already commented");
-        review.commentERC20(address(mockERC20), "cid", "pOPId");
+        review.commentERC20(address(mockERC20), "cid", signal, root, nullifierHash, proof);
         vm.stopPrank();
     }
 
     function test_RevertWhen_DoubleOpinion1155() public {
         vm.startPrank(alice);
-        review.commentERC1155(address(mockERC1155), 0, "cid", "pOPId");
+        review.commentERC1155(address(mockERC1155), 0, "cid", signal, root, nullifierHash, proof);
         vm.expectRevert("Already commented");
-        review.commentERC1155(address(mockERC1155), 0, "cid", "pOPId");
+        review.commentERC1155(address(mockERC1155), 0, "cid", signal, root, nullifierHash, proof);
         vm.stopPrank();
     }
 
     function test_RevertWhen_NotHolder() public {
         vm.expectRevert("Not a holder");
-        review.commentERC20(address(mockERC20), "cid", "pOPId");
+        review.commentERC20(address(mockERC20), "cid", signal, root, nullifierHash, proof);
     }
 
     function test_Name() public {
