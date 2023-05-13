@@ -1,0 +1,49 @@
+{
+  "name": "next-web3-boilerplate",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "prettier": "prettier --write .",
+    "typecheck": "tsc --pretty --noEmit",
+    "eth-sdk": "eth-sdk -p ./src/eth-sdk"
+  },
+  "dependencies": {
+    "@airstack/airstack-react": "^0.2.1",
+    "@rainbow-me/rainbowkit": "^0.8.1",
+    "@tanstack/react-query": "^4.22.0",
+    "@worldcoin/idkit": "^0.4.9",
+    "axios": "^1.2.2",
+    "ethers": "^5.7.2",
+    "next": "^13.4.2",
+    "nextjs-progressbar": "^0.0.16",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-simple-star-rating": "^5.1.7",
+    "wagmi": "^0.9.0",
+    "web3.storage": "^4.5.4"
+  },
+  "devDependencies": {
+    "@dethcrypto/eth-sdk": "^0.3.3",
+    "@dethcrypto/eth-sdk-client": "^0.1.6",
+    "@types/node": "18.11.18",
+    "@types/react": "18.0.26",
+    "@types/react-dom": "18.0.10",
+    "@typescript-eslint/eslint-plugin": "^5.48.1",
+    "@typescript-eslint/parser": "^5.48.1",
+    "autoprefixer": "^10.4.13",
+    "eslint": "^8.31.0",
+    "eslint-config-next": "^13.1.1",
+    "eslint-config-prettier": "^8.6.0",
+    "husky": "^8.0.3",
+    "postcss": "^8.4.21",
+    "prettier": "^2.8.2",
+    "prettier-plugin-tailwindcss": "^0.2.1",
+    "tailwindcss": "^3.2.4",
+    "ts-node": "^10.9.1",
+    "typescript": "4.9.4"
+  }
+}
