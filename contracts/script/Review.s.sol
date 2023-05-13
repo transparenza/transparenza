@@ -10,9 +10,9 @@ contract DeployReview is Script {
     function run() public {
         vm.startBroadcast();
 
-        worldID = IWorldID(address(25));
+        worldID = IWorldID(address(0xD81dE4BCEf43840a2883e5730d014630eA6b7c4A));
 
-        new Review(worldID, "app_1234", "wid_test");
+        new Review(worldID, "app_staging_391283f08c9663b3c213b71c38428724", "create-comment");
 
         vm.stopBroadcast();
     }
