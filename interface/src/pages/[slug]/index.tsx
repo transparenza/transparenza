@@ -61,7 +61,7 @@ const Entity: NextPage<PageProps> = ({ entity }) => {
               <div>
                 <h1 className="text-8xl font-medium uppercase">{entity.name}</h1>
                 <div className="text-sm font-medium text-gray-500">
-                  {shortenAddress(entity.address[CHAIN_ID])}
+                  {shortenAddress(entity.tokenAddress[CHAIN_ID])}
                 </div>
               </div>
             </div>

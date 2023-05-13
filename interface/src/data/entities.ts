@@ -6,9 +6,9 @@ const entities: Entity[] = [
     name: 'Nouns',
     logoUrl: 'https://pbs.twimg.com/profile_images/1467601380567359498/oKcnQo_S_400x400.jpg',
     tokenStandard: 'ERC721',
-    address: {
+    tokenAddress: {
       [Chain.Polygon]: '0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85',
-      [Chain.PolygonMumbai]: '0x3d1d4E623Ddc6Cc990DeD3c563A675D79E570Bf2'
+      [Chain.PolygonMumbai]: '0x5D4effd4A4610Fb5d895aa910AB7FD8775B18211'
     }
   },
   {
@@ -16,9 +16,9 @@ const entities: Entity[] = [
     name: 'Adidas',
     logoUrl: '',
     tokenStandard: 'ERC721',
-    address: {
+    tokenAddress: {
       [Chain.Polygon]: '0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85',
-      [Chain.PolygonMumbai]: '0x3d1d4E623Ddc6Cc990DeD3c563A675D79E570Bf2'
+      [Chain.PolygonMumbai]: '0x5D4effd4A4610Fb5d895aa910AB7FD8775B18211'
     }
   },
   {
@@ -26,9 +26,9 @@ const entities: Entity[] = [
     name: 'Lens',
     logoUrl: '',
     tokenStandard: 'ERC721',
-    address: {
+    tokenAddress: {
       [Chain.Polygon]: '0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85',
-      [Chain.PolygonMumbai]: '0x3d1d4E623Ddc6Cc990DeD3c563A675D79E570Bf2'
+      [Chain.PolygonMumbai]: '0x5D4effd4A4610Fb5d895aa910AB7FD8775B18211'
     }
   },
   {
@@ -37,9 +37,9 @@ const entities: Entity[] = [
     name: 'Nike',
     logoUrl: '',
     tokenStandard: 'ERC721',
-    address: {
+    tokenAddress: {
       [Chain.Polygon]: '0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85',
-      [Chain.PolygonMumbai]: '0x3d1d4E623Ddc6Cc990DeD3c563A675D79E570Bf2'
+      [Chain.PolygonMumbai]: '0x5D4effd4A4610Fb5d895aa910AB7FD8775B18211'
     }
   }
 ]

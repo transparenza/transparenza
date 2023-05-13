@@ -8,7 +8,12 @@ import { createJsonFile } from 'utils/files'
 import { IDKitWidget, ISuccessResult } from '@worldcoin/idkit'
 import { useState, useCallback, useMemo, FC } from 'react'
 import storage from 'services/storage'
-import { useAccount } from 'wagmi'
+import { useAccount, useSigner } from 'wagmi'
+import { toast } from 'react-hot-toast'
+import { CHAIN_ID } from 'config'
+import useTransparenza from 'hooks/useTransparenza'
+import { defaultAbiCoder as abi } from '@ethersproject/abi'
+import { arrayify } from 'ethers/lib/utils'
 
 interface PageProps {
   entity: Entity
@@ -21,6 +26,9 @@ interface ReviewData {
 }
 
 const CreateReview: NextPage<PageProps> = ({ entity }) => {
+  const { data: signer } = useSigner()
+  const transparenza = useTransparenza(signer)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [review, setReview] = useState<ReviewData>({
     title: '',
     text: '',
@@ -35,19 +43,84 @@ const CreateReview: NextPage<PageProps> = ({ entity }) => {
     })
   }, [])
 
+
   const onVerification = useCallback(
     async (verification: ISuccessResult) => {
-      const fileName = `${entity.slug}_${new Date().toISOString()}`
-      const file = createJsonFile(review, fileName)
-      const cid = await storage.put([file], {
-        name: fileName
-      })
+      console.log('verification', verification)
 
-      // todo: Call the smart contract
+      try {
+        if (!signer) {
+          toast.error('Please connect your wallet.')
+          return
+        }
 
-      resetForm()
+        setIsSubmitting(true)
+
+        const fileName = `${entity.slug}_${new Date().toISOString()}`
+        const file = createJsonFile(review, fileName)
+        const cid = await storage.put([file], {
+          name: fileName
+        })
+
+        const unpackedProof = abi.decode(['uint256[8]'], verification.proof)[0]
+        
+        if (entity.tokenStandard === 'ERC20') {
+          const tx = await transparenza.commentERC20(
+            entity.tokenAddress[CHAIN_ID],
+            cid,
+            verification.merkle_root,
+            verification.nullifier_hash,
+            unpackedProof
+          )
+
+          const txResponse = await tx.wait()
+
+          console.log(txResponse)
+        } else if (entity.tokenStandard === 'ERC721') {
+          const tx = await transparenza.commentERC721(
+            entity.tokenAddress[CHAIN_ID],
+            cid,
+            verification.merkle_root,
+            verification.nullifier_hash,
+            unpackedProof
+          )
+
+          const txResponse = await tx.wait()
+
+          console.log(txResponse)
+        } else if (entity.tokenStandard === 'ERC1155') {
+          if (!entity.tokenId) {
+            toast.error(`Token standard ${entity.tokenStandard} requires a token ID.}`)
+            return
+          }
+
+          const tx = await transparenza.commentERC1155(
+            entity.tokenAddress[CHAIN_ID],
+            entity.tokenId[CHAIN_ID],
+            cid,
+            verification.merkle_root,
+            verification.nullifier_hash,
+            unpackedProof
+          )
+
+          const txResponse = await tx.wait()
+
+          console.log(txResponse)
+        } else {
+          toast.error(`Token standard ${entity.tokenStandard} not supported.}`)
+          return
+        }
+
+        resetForm()
+        toast.success('Review created successfully!')
+      } catch (e) {
+        console.error(e)
+        toast.error('Something went wrong. Please try again.')
+      } finally {
+        setIsSubmitting(false)
+      }
     },
-    [entity.slug, resetForm, review]
+    [entity, resetForm, review, signer, transparenza]
   )
 
   return (
@@ -67,7 +140,13 @@ const CreateReview: NextPage<PageProps> = ({ entity }) => {
               theme="dark"
             >
               {({ open }) => (
-                <ReviewForm review={review} setReview={setReview} onSubmit={() => open()} />
+                <ReviewForm
+                  review={review}
+                  setReview={setReview}
+                  onSubmit={() => open()} // todo: uncomment this
+                  // onSubmit={() => onVerification()}
+                  isSubmitting={isSubmitting}
+                />
               )}
             </IDKitWidget>
           </div>
@@ -80,26 +159,28 @@ const CreateReview: NextPage<PageProps> = ({ entity }) => {
 const ReviewForm: FC<{
   review: ReviewData
   setReview: (review: ReviewData) => void
+  isSubmitting: boolean
   onSubmit: () => void
-}> = ({ review, setReview, onSubmit }) => {
+}> = ({ review, setReview, isSubmitting, onSubmit }) => {
   const { title, text, rating } = review
   const { isConnected } = useAccount()
 
   const isValid = useMemo(() => {
-    return title.length > 0 && text.length > 0 && rating > 0 && isConnected
-  }, [title.length, text.length, rating, isConnected])
+    return title.length > 0 && text.length > 0 && rating > 0
+  }, [title.length, text.length, rating])
 
   return (
     <div className="w-full">
       <input
         placeholder="Title"
-        className="placeholder:text-neutral-600 w-full border-b border-b-neutral-800 bg-transparent p-5 text-3xl font-medium outline-none"
+        className="w-full border-b border-b-neutral-800 bg-transparent p-5 text-3xl font-medium outline-none placeholder:text-neutral-600"
         value={title}
         onChange={(e) => setReview({ ...review, title: e.target.value })}
       />
       <textarea
         placeholder="Write your unhinged, honest thoughts here..."
-        className="placeholder:text-neutral-600 block min-h-[200px] w-full border-b border-b-neutral-800 bg-transparent p-5 text-lg text-white outline-none"
+        className="block min-h-[200px] w-full border-b border-b-neutral-800 bg-transparent p-5 text-lg text-white outline-none placeholder:text-neutral-600"
+        value={text}
         onChange={(e) => setReview({ ...review, text: e.target.value })}
         style={{ resize: 'none' }}
       />
@@ -112,11 +193,16 @@ const ReviewForm: FC<{
             onClick={(rate) => setReview({ ...review, rating: rate })}
             SVGclassName="inline text-[10px]"
             size={24}
+            allowFraction={false}
           />
         </ClientOnly>
       </div>
       <div className="p-5">
-        <button className="w-full bg-white p-4 text-black" onClick={onSubmit} disabled={!isValid}>
+        <button
+          className="w-full bg-white p-4 text-black"
+          onClick={onSubmit}
+          disabled={!isValid || !isConnected || isSubmitting}
+        >
           Submit review
         </button>
       </div>

@@ -6,7 +6,8 @@ export enum Chain {
 export type TokenStandard = 'ERC20' | 'ERC721' | 'ERC1155'
 
 export interface Entity {
-  address: { [key in Chain | number]: string }
+  tokenAddress: { [key in Chain | number]: string }
+  tokenId?: { [key in Chain | number]: string}
   tokenStandard: TokenStandard
   name: string
   slug: string
