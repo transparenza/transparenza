@@ -19,6 +19,7 @@ dataSources:
       entities:
         - CommentERC20Event
         - CommentERC721Event
+        - CommentERC1155Event
       abis:
         - name: Review
           file: ./abi/Review.json
@@ -27,3 +28,5 @@ dataSources:
           handler: handleCommentERC20
         - event: CommentERC721(indexed address,indexed address,string)
           handler: handleCommentERC721
+        - event: CommentERC1155(indexed address,indexed uint256,indexed address,string)
+          handler: handleCommentERC1155

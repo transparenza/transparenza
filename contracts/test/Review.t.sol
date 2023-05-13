@@ -18,7 +18,7 @@ contract ReviewTest is Test {
 
     event CommentERC20(address indexed token, address indexed sender, string cid);
     event CommentERC721(address indexed token, address indexed sender, string cid);
-    event CommentERC1155(address indexed token, uint256 indexed id, address indexed sender, string cid);
+    event CommentERC1155(address indexed token, uint256 indexed tokenId, address indexed sender, string cid);
 
     function setUp() public {
         mockERC20 = new MockERC20();

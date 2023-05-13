@@ -1,6 +1,6 @@
 import { log, BigInt } from '@graphprotocol/graph-ts';
-import { CommentERC20, CommentERC721 } from './types/Review/Review';
-import { CommentERC20Event, CommentERC721Event } from './types/schema';
+import { CommentERC20, CommentERC721, CommentERC1155 } from './types/Review/Review';
+import { CommentERC20Event, CommentERC721Event, CommentERC1155Event } from './types/schema';
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
@@ -51,4 +51,29 @@ export function handleCommentERC721(event: CommentERC721): void {
         event.params.cid
     ]);
 }
+
+export function handleCommentERC1155(event: CommentERC1155): void {
+
+    const commentERC1155Event = new CommentERC1155Event(
+        event.transaction.hash.toHexString()
+    );
+
+    commentERC1155Event.token = event.params.token.toHexString();
+    commentERC1155Event.tokenId = event.params.tokenId;
+    commentERC1155Event.sender = event.params.sender.toHexString();
+    commentERC1155Event.cid = event.params.cid;
+    commentERC1155Event.blockNumber = event.block.number;
+    commentERC1155Event.blockTimestamp = event.block.timestamp;
+    commentERC1155Event.save();
+
+    log.info('Log Event Block: {} Time: {} token: {} tokenId: {} sender: {} cid: {}', [
+        event.block.number.toString(),
+        event.block.timestamp.toString(),
+        event.params.token.toHexString(),
+        event.params.tokenId.toString(),
+        event.params.sender.toHexString(),
+        event.params.cid
+    ]);
+}
+
 

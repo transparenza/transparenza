@@ -10,7 +10,7 @@ import {IERC165} from "forge-std/interfaces/IERC165.sol";
 contract Review {
     /// Token => EOA => hasCommented
     mapping(address => mapping(address => bool)) public accountReviewedToken;
-    /// Token => id => EOA => hasCommented
+    /// Token => tokenId => EOA => hasCommented
     mapping(address => mapping(uint256 => mapping(address => bool))) public accountReviewedERC1155;
     /// EOA => counter
     mapping(address => uint256) public counter;
@@ -21,7 +21,7 @@ contract Review {
 
     event CommentERC20(address indexed token, address indexed sender, string cid);
     event CommentERC721(address indexed token, address indexed sender, string cid);
-    event CommentERC1155(address indexed token, uint256 indexed id, address indexed sender, string cid);
+    event CommentERC1155(address indexed token, uint256 indexed tokenId, address indexed sender, string cid);
 
     function commentERC20(address token, string calldata cid, string calldata pOPId) public {
         (bool success, bytes memory data) = token.call(abi.encodeWithSelector(IERC20.balanceOf.selector, msg.sender));
@@ -50,21 +50,21 @@ contract Review {
         emit CommentERC721(token, msg.sender, cid);
     }
 
-    function commentERC1155(address token, uint256 id, string calldata cid, string calldata pOPId) public {
+    function commentERC1155(address token, uint256 tokenId, string calldata cid, string calldata pOPId) public {
         (bool success1155, bytes memory data1155) =
             token.call(abi.encodeWithSelector(IERC165.supportsInterface.selector, _interfaceIdERC1155));
 
         require(success1155 && abi.decode(data1155, (bool)), "Not ERC1155");
 
         (bool success, bytes memory data) =
-            token.call(abi.encodeWithSelector(IERC1155.balanceOf.selector, msg.sender, id));
+            token.call(abi.encodeWithSelector(IERC1155.balanceOf.selector, msg.sender, tokenId));
         _checkIsHolder(success, data);
 
-        _setReview1155(token, id, msg.sender);
+        _setReview1155(token, tokenId, msg.sender);
 
         _count(msg.sender);
 
-        emit CommentERC1155(token, id, msg.sender, cid);
+        emit CommentERC1155(token, tokenId, msg.sender, cid);
     }
 
     function _count(address sender) private {
@@ -76,9 +76,9 @@ contract Review {
         accountReviewedToken[token][sender] = true;
     }
 
-    function _setReview1155(address token, uint256 id, address sender) private {
-        require(!accountReviewedERC1155[token][id][sender], "Already commented");
-        accountReviewedERC1155[token][id][sender] = true;
+    function _setReview1155(address token, uint256 tokenId, address sender) private {
+        require(!accountReviewedERC1155[token][tokenId][sender], "Already commented");
+        accountReviewedERC1155[token][tokenId][sender] = true;
     }
 
     function _checkIsHolder(bool success, bytes memory data) private pure {
