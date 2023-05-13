@@ -1,9 +1,19 @@
 [
   {
+    "inputs": [
+      { "internalType": "contract IWorldID", "name": "_worldId", "type": "address" },
+      { "internalType": "string", "name": "_appId", "type": "string" },
+      { "internalType": "string", "name": "_actionId", "type": "string" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  { "inputs": [], "name": "InvalidNullifier", "type": "error" },
+  {
     "anonymous": false,
     "inputs": [
       { "indexed": true, "internalType": "address", "name": "token", "type": "address" },
-      { "indexed": true, "internalType": "uint256", "name": "id", "type": "uint256" },
+      { "indexed": true, "internalType": "uint256", "name": "tokenId", "type": "uint256" },
       { "indexed": true, "internalType": "address", "name": "sender", "type": "address" },
       { "indexed": false, "internalType": "string", "name": "cid", "type": "string" }
     ],
@@ -54,9 +64,11 @@
   {
     "inputs": [
       { "internalType": "address", "name": "token", "type": "address" },
-      { "internalType": "uint256", "name": "id", "type": "uint256" },
+      { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
       { "internalType": "string", "name": "cid", "type": "string" },
-      { "internalType": "string", "name": "pOPId", "type": "string" }
+      { "internalType": "uint256", "name": "root", "type": "uint256" },
+      { "internalType": "uint256", "name": "nullifierHash", "type": "uint256" },
+      { "internalType": "uint256[8]", "name": "proof", "type": "uint256[8]" }
     ],
     "name": "commentERC1155",
     "outputs": [],
@@ -67,7 +79,9 @@
     "inputs": [
       { "internalType": "address", "name": "token", "type": "address" },
       { "internalType": "string", "name": "cid", "type": "string" },
-      { "internalType": "string", "name": "pOPId", "type": "string" }
+      { "internalType": "uint256", "name": "root", "type": "uint256" },
+      { "internalType": "uint256", "name": "nullifierHash", "type": "uint256" },
+      { "internalType": "uint256[8]", "name": "proof", "type": "uint256[8]" }
     ],
     "name": "commentERC20",
     "outputs": [],
@@ -78,7 +92,9 @@
     "inputs": [
       { "internalType": "address", "name": "token", "type": "address" },
       { "internalType": "string", "name": "cid", "type": "string" },
-      { "internalType": "string", "name": "pOPId", "type": "string" }
+      { "internalType": "uint256", "name": "root", "type": "uint256" },
+      { "internalType": "uint256", "name": "nullifierHash", "type": "uint256" },
+      { "internalType": "uint256[8]", "name": "proof", "type": "uint256[8]" }
     ],
     "name": "commentERC721",
     "outputs": [],
@@ -97,6 +113,18 @@
     "name": "name",
     "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "signal", "type": "address" },
+      { "internalType": "uint256", "name": "root", "type": "uint256" },
+      { "internalType": "uint256", "name": "nullifierHash", "type": "uint256" },
+      { "internalType": "uint256[8]", "name": "proof", "type": "uint256[8]" }
+    ],
+    "name": "verifyAndExecute",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   }
 ]

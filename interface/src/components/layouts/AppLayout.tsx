@@ -1,6 +1,7 @@
+import { Toaster } from 'react-hot-toast'
+import type { ReactNode } from 'react'
 import Navbar from 'components/ui/Navbar'
 import ProgressBar from 'components/ui/ProgressBar'
-import type { ReactNode } from 'react'
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   return (
@@ -10,6 +11,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         <Navbar />
         <main className="flex flex-1 flex-col">{children}</main>
       </div>
+      <Toaster />
     </>
   )
 }
