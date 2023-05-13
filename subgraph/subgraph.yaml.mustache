@@ -18,9 +18,12 @@ dataSources:
       file: ./src/review.ts
       entities:
         - CommentERC20Event
+        - CommentERC721Event
       abis:
         - name: Review
           file: ./abi/Review.json
       eventHandlers:
         - event: CommentERC20(indexed address,indexed address,string)
           handler: handleCommentERC20
+        - event: CommentERC721(indexed address,indexed address,string)
+          handler: handleCommentERC721
