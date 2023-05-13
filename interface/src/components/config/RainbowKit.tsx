@@ -13,7 +13,6 @@ import {
 } from '@rainbow-me/rainbowkit/wallets'
 import { INFURA_API_KEY, CHAIN_ID, IS_CLIENT } from 'config'
 import type { ReactNode } from 'react'
-import LocalStorage from 'services/localStorage'
 import { Chain } from 'types/types'
 import { configureChains, createClient, WagmiConfig } from 'wagmi'
 import { polygon, polygonMumbai } from 'wagmi/chains'
@@ -22,7 +21,7 @@ import { infuraProvider } from 'wagmi/providers/infura'
 const needsInjectedWallet =
   IS_CLIENT && window.ethereum && !window.ethereum.isMetaMask && !window.ethereum.isCoinbaseWallet
 
-const { chains, provider, webSocketProvider } = configureChains(
+const { chains, provider } = configureChains(
   [CHAIN_ID === Chain.Polygon ? polygon : polygonMumbai],
   [
     infuraProvider({
@@ -54,10 +53,9 @@ const connectors = connectorsForWallets([
 ])
 
 const wagmiClient = createClient({
-  autoConnect: IS_CLIENT && LocalStorage.get('shouldAutoConnect'),
+  autoConnect: IS_CLIENT,
   connectors,
-  provider,
-  webSocketProvider: IS_CLIENT ? webSocketProvider : undefined
+  provider
 })
 
 export default function RainbowKit({ children }: { children: ReactNode }) {

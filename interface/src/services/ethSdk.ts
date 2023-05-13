@@ -7,4 +7,5 @@ const sdk =
   CHAIN_ID === Chain.Polygon
     ? getPolygonMumbaiSdk(staticProvider)
     : getPolygonMumbaiSdk(staticProvider) // todo: change to getPolygonMainnetSdk(staticProvider) when ready
+
 export default sdk

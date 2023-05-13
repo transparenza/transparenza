@@ -2,7 +2,7 @@
 @layer base {
   html,
   body {
-    @apply h-full w-full;
+    @apply h-full w-full bg-black text-white;
     @apply selection:bg-black selection:text-white;
   }
 }
@@ -10,7 +10,7 @@
 @tailwind components;
 @layer components {
   .container-content {
-    @apply mx-auto w-full max-w-7xl px-4 md:px-8;
+    @apply mx-auto w-full px-12;
   }
 }
 
