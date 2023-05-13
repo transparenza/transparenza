@@ -20,7 +20,7 @@ export default function useReview(cid: string) {
 
     const url = createIpfsUrl(cid, file.name)
     const { data } = await axios.get(url)
-    const review: Review = {...data, url}
+    const review: Review = { ...data, url }
 
     return review
   })

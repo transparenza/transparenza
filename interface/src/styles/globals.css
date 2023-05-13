@@ -3,7 +3,7 @@
   html,
   body {
     @apply h-full w-full bg-black text-white;
-    @apply selection:bg-black selection:text-white;
+    @apply selection:bg-white selection:text-black;
   }
 }
 
