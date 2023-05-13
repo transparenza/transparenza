@@ -10,7 +10,7 @@ module.exports = {
         secondary: ['var(--font-secondary)', ...fontFamily.sans]
       },
       height: {
-        navbar: '64px'
+        navbar: '72px'
       }
     }
   },
