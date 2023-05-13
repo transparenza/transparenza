@@ -1,0 +1,16 @@
+type CommentERC20Event @entity {
+  "The txn hash of this event"
+  id: ID!
+
+  token: String!
+
+  sender: String!
+
+  cid: String!
+
+  "Block number of the event"
+  blockNumber: BigInt!
+
+  "The timestamp of the block the event is in"
+  blockTimestamp: BigInt!
+}

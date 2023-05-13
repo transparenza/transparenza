@@ -1,0 +1,26 @@
+specVersion: 0.0.3
+description: >-
+  New review implementation
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: Review
+    network: {{network}}
+    source:
+      address: '{{token.address}}'
+      abi: Review
+      startBlock: {{token.startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/review.ts
+      entities:
+        - CommentERC20Event
+      abis:
+        - name: Review
+          file: ./abi/Review.json
+      eventHandlers:
+        - event: CommentERC20(indexed address,indexed address,string)
+          handler: handleCommentERC20

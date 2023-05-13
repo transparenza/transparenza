@@ -1,0 +1,30 @@
+{
+  "name": "@transparenza/subgraph",
+  "version": "0.0.0",
+  "license": "MIT",
+  "main": "build/index.js",
+  "directories": {
+    "src": "src"
+  },
+  "scripts": {
+    "graph-node": "docker-compose up",
+    "clean": "rimraf ./src/types ./build subgraph.yaml",
+    "prepare:local": "mustache config/local.json subgraph.yaml.mustache > subgraph.yaml",
+    "prepare:mumbai": "mustache config/mumbai.json subgraph.yaml.mustache > subgraph.yaml",
+    "prepare:hardhat": "mustache config/hardhat.json subgraph.yaml.mustache > subgraph.yaml",
+    "prepare:rinkeby": "mustache config/rinkeby.json subgraph.yaml.mustache > subgraph.yaml",
+    "prepare:mainnet": "mustache config/mainnet.json subgraph.yaml.mustache > subgraph.yaml",
+    "prepare:goerli": "mustache config/goerli.json subgraph.yaml.mustache > subgraph.yaml",
+    "codegen": "graph codegen --output-dir src/types/",
+    "test:configgen": "echo libsFolder: $(dirname `cd ../..; pwd`)/transparenza/node_modules > matchstick.yaml",
+    "test": "graph test",
+    "deploy:mumbai": "npm run clean && npm run prepare:mumbai && npm run codegen && graph deploy --studio transparenza-mumbai",
+    "mustache": "mustache"
+  },
+  "devDependencies": {
+    "@graphprotocol/graph-ts": "0.27.0",
+    "matchstick-as": "0.5.0",
+    "mustache": "4.2.0",
+    "rimraf": "5.0.0"
+  }
+}
