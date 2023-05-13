@@ -56,12 +56,11 @@ contract Review {
     function commentERC20(
         address token,
         string calldata cid,
-        address signal,
         uint256 root,
         uint256 nullifierHash,
         uint256[8] calldata proof
     ) public {
-        verifyAndExecute(signal, root, nullifierHash, proof);
+        verifyAndExecute(msg.sender, root, nullifierHash, proof);
         (bool success, bytes memory data) = token.call(abi.encodeWithSelector(IERC20.balanceOf.selector, msg.sender));
         _checkIsHolder(success, data);
 
@@ -75,12 +74,11 @@ contract Review {
     function commentERC721(
         address token,
         string calldata cid,
-        address signal,
         uint256 root,
         uint256 nullifierHash,
         uint256[8] calldata proof
     ) public {
-        verifyAndExecute(signal, root, nullifierHash, proof);
+        verifyAndExecute(msg.sender, root, nullifierHash, proof);
         (bool success721, bytes memory data721) =
             token.call(abi.encodeWithSelector(IERC165.supportsInterface.selector, _interfaceIdERC721));
 
@@ -100,12 +98,11 @@ contract Review {
         address token,
         uint256 tokenId,
         string calldata cid,
-        address signal,
         uint256 root,
         uint256 nullifierHash,
         uint256[8] calldata proof
     ) public {
-        verifyAndExecute(signal, root, nullifierHash, proof);
+        verifyAndExecute(msg.sender, root, nullifierHash, proof);
         (bool success1155, bytes memory data1155) =
             token.call(abi.encodeWithSelector(IERC165.supportsInterface.selector, _interfaceIdERC1155));
 
