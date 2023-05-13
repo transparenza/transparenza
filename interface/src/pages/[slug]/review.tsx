@@ -13,7 +13,6 @@ import { toast } from 'react-hot-toast'
 import { CHAIN_ID } from 'config'
 import useTransparenza from 'hooks/useTransparenza'
 import { defaultAbiCoder as abi } from '@ethersproject/abi'
-import { arrayify } from 'ethers/lib/utils'
 
 interface PageProps {
   entity: Entity
@@ -43,7 +42,6 @@ const CreateReview: NextPage<PageProps> = ({ entity }) => {
     })
   }, [])
 
-
   const onVerification = useCallback(
     async (verification: ISuccessResult) => {
       console.log('verification', verification)
@@ -63,7 +61,7 @@ const CreateReview: NextPage<PageProps> = ({ entity }) => {
         })
 
         const unpackedProof = abi.decode(['uint256[8]'], verification.proof)[0]
-        
+
         if (entity.tokenStandard === 'ERC20') {
           const tx = await transparenza.commentERC20(
             entity.tokenAddress[CHAIN_ID],
@@ -226,6 +224,7 @@ export const getStaticProps: GetStaticProps<PageProps> = async ({ params }) => {
       notFound: true
     }
   }
+
   return {
     props: {
       entity

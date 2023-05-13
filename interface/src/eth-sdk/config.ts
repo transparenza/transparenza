@@ -2,7 +2,7 @@ import { defineConfig } from '@dethcrypto/eth-sdk'
 
 export default defineConfig({
   rpc: {
-    polygonMumbai: 'https://polygon-testnet.public.blastapi.io',
+    polygonMumbai: 'https://polygon-testnet.public.blastapi.io'
   },
   contracts: {
     // polygon: {
