@@ -4,7 +4,10 @@ import Link from 'next/link'
 
 export default function Navbar() {
   return (
-    <header className="sticky top-0 z-10 w-full border-b border-b-neutral-800">
+    <header
+      className="sticky top-0 z-10 w-full border-b border-b-neutral-800"
+      style={{ background: '#00070F', borderBottom: '2px solid white' }}
+    >
       <div className="container-content flex h-navbar items-center justify-between">
         <div>
           <Link
@@ -27,6 +30,14 @@ export default function Navbar() {
           </Link>
         </div>
         <nav className="flex items-center space-x-4">
+          <span
+            style={{
+              color: '#ff0080',
+              fontStyle: 'italic'
+            }}
+          >
+            Gasless experience
+          </span>
           <ConnectButton showBalance={false} />
         </nav>
       </div>
