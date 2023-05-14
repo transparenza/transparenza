@@ -11,7 +11,7 @@ export default function Navbar() {
           </Link>
         </div>
         <nav className="flex items-center space-x-4">
-          <ConnectButton />
+          <ConnectButton showBalance={false}/>
         </nav>
       </div>
     </header>
