@@ -5,6 +5,9 @@ module.exports = {
   content: ['./src/pages/**/*.{jsx,tsx}', './src/components/**/*.{jsx,tsx}'],
   theme: {
     extend: {
+      colors: {
+        'black': '#191919'
+      },
       fontFamily: {
         primary: ['var(--font-primary)', ...fontFamily.sans],
         secondary: ['var(--font-secondary)', ...fontFamily.sans]

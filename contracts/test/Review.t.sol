@@ -35,7 +35,7 @@ contract ReviewTest is Test {
 
         worldID = IWorldID(address(25));
 
-        review = new Review(worldID, "app_1234", "wid_test");
+        review = new Review(worldID, "app_1234", "wid_test", address(50));
     }
 
     function test_commentERC20() public {

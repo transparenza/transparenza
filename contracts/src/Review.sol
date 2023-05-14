@@ -10,8 +10,9 @@ import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import {IERC721} from "openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
 import {IERC1155} from "openzeppelin-contracts/contracts/token/ERC1155/IERC1155.sol";
 import {IERC165} from "forge-std/interfaces/IERC165.sol";
+import {ERC2771Context} from "relay-context-contracts/vendor/ERC2771Context.sol";
 
-contract Review {
+contract Review is ERC2771Context {
     using ByteHasher for bytes;
 
     /// Token => EOA => hasCommented
@@ -41,6 +42,10 @@ contract Review {
     /// single person
     mapping(uint256 => bool) internal nullifierHashes;
 
+    mapping(address => uint256) public contextCounter;
+
+    event IncrementContextCounter(address _msgSender);
+
     event CommentERC20(address indexed token, address indexed sender, string cid);
     event CommentERC721(address indexed token, address indexed sender, string cid);
     event CommentERC1155(address indexed token, uint256 indexed tokenId, address indexed sender, string cid);
@@ -48,7 +53,9 @@ contract Review {
     /// @param _worldId The WorldID instance that will verify the proofs
     /// @param _appId The World ID app ID
     /// @param _actionId The World ID action ID
-    constructor(IWorldID _worldId, string memory _appId, string memory _actionId) {
+    constructor(IWorldID _worldId, string memory _appId, string memory _actionId, address trustedForwarder)
+        ERC2771Context(trustedForwarder)
+    {
         worldId = _worldId;
         externalNullifier = abi.encodePacked(abi.encodePacked(_appId).hashToField(), _actionId).hashToField();
     }
@@ -58,17 +65,17 @@ contract Review {
         string calldata cid,
         uint256 root,
         uint256 nullifierHash,
-        uint256[8] calldata proof
+        uint256[8] memory proof
     ) public {
-        verifyAndExecute(msg.sender, root, nullifierHash, proof);
-        (bool success, bytes memory data) = token.call(abi.encodeWithSelector(IERC20.balanceOf.selector, msg.sender));
+        verifyAndExecute(_msgSender(), root, nullifierHash, proof);
+        (bool success, bytes memory data) = token.call(abi.encodeWithSelector(IERC20.balanceOf.selector, _msgSender()));
         _checkIsHolder(success, data);
 
-        _setReview(token, msg.sender);
+        _setReview(token, _msgSender());
 
-        _count(msg.sender);
+        _count(_msgSender());
 
-        emit CommentERC20(token, msg.sender, cid);
+        emit CommentERC20(token, _msgSender(), cid);
     }
 
     function commentERC721(
@@ -76,22 +83,35 @@ contract Review {
         string calldata cid,
         uint256 root,
         uint256 nullifierHash,
-        uint256[8] calldata proof
+        uint256[8] memory proof
     ) public {
-        verifyAndExecute(msg.sender, root, nullifierHash, proof);
+        verifyAndExecute(_msgSender(), root, nullifierHash, proof);
+
         (bool success721, bytes memory data721) =
             token.call(abi.encodeWithSelector(IERC165.supportsInterface.selector, _interfaceIdERC721));
 
         require(success721 && abi.decode(data721, (bool)), "Not ERC721");
 
-        (bool success, bytes memory data) = token.call(abi.encodeWithSelector(IERC721.balanceOf.selector, msg.sender));
+        (bool success, bytes memory data) = token.call(abi.encodeWithSelector(IERC721.balanceOf.selector, _msgSender()));
         _checkIsHolder(success, data);
 
-        _setReview(token, msg.sender);
+        uint256 chainId;
 
-        _count(msg.sender);
+        // solhint-disable-next-line no-inline-assembly
+        assembly {
+            chainId := chainid()
+        }
 
-        emit CommentERC721(token, msg.sender, cid);
+        /// Mumbai chain should allow multiple reviews to demo easily
+        if (chainId == 137) {
+            _setReview(token, _msgSender());
+        } else {
+            accountReviewedToken[token][_msgSender()] = true;
+        }
+
+        _count(_msgSender());
+
+        emit CommentERC721(token, _msgSender(), cid);
     }
 
     function commentERC1155(
@@ -100,23 +120,23 @@ contract Review {
         string calldata cid,
         uint256 root,
         uint256 nullifierHash,
-        uint256[8] calldata proof
+        uint256[8] memory proof
     ) public {
-        verifyAndExecute(msg.sender, root, nullifierHash, proof);
+        verifyAndExecute(_msgSender(), root, nullifierHash, proof);
         (bool success1155, bytes memory data1155) =
             token.call(abi.encodeWithSelector(IERC165.supportsInterface.selector, _interfaceIdERC1155));
 
         require(success1155 && abi.decode(data1155, (bool)), "Not ERC1155");
 
         (bool success, bytes memory data) =
-            token.call(abi.encodeWithSelector(IERC1155.balanceOf.selector, msg.sender, tokenId));
+            token.call(abi.encodeWithSelector(IERC1155.balanceOf.selector, _msgSender(), tokenId));
         _checkIsHolder(success, data);
 
-        _setReview1155(token, tokenId, msg.sender);
+        _setReview1155(token, tokenId, _msgSender());
 
-        _count(msg.sender);
+        _count(_msgSender());
 
-        emit CommentERC1155(token, tokenId, msg.sender, cid);
+        emit CommentERC1155(token, tokenId, _msgSender(), cid);
     }
 
     /// @param signal An arbitrary input from the user, usually the user's wallet address (check README for further
@@ -126,7 +146,7 @@ contract Review {
     /// @param proof The zero-knowledge proof that demonstrates the claimer is registered with World ID (returned by
     /// the JS widget).
     /// @dev Feel free to rename this method however you want! We've used `claim`, `verify` or `execute` in the past.
-    function verifyAndExecute(address signal, uint256 root, uint256 nullifierHash, uint256[8] calldata proof) public {
+    function verifyAndExecute(address signal, uint256 root, uint256 nullifierHash, uint256[8] memory proof) public {
         uint256 chainId;
 
         // solhint-disable-next-line no-inline-assembly
@@ -147,6 +167,30 @@ contract Review {
             // We now record the user has done this, so they can't do it again (proof of uniqueness)
             nullifierHashes[nullifierHash] = true;
         }
+    }
+
+    // `incrementContext` is the target function to call
+    // This function increments a counter variable which is
+    // mapped to every _msgSender(), the address of the user.
+    // This way each user off-chain has their own counter
+    // variable on-chain.
+    function incrementContext() external {
+        // Remember that with the context shift of relaying,
+        // where we would use `_msgSender()` before,
+        // this now refers to Gelato Relay's address,
+        // and to find the address of the user,
+        // which has been verified using a signature,
+        // please use _msgSender()!
+
+        // If this contract was not not called by the
+        // trusted forwarder, _msgSender() will simply return
+        // the value of _msgSender() instead.
+
+        // Incrementing the counter mapped to the _msgSender!
+        contextCounter[_msgSender()]++;
+
+        // Emitting an event for testing purposes
+        emit IncrementContextCounter(_msgSender());
     }
 
     function _count(address sender) private {

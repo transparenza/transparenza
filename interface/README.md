@@ -1,3 +1,35 @@
+# TRANSPARENZA
+
+https://www.transparenza.xyz/
+
+Please use Mumbai or Polygon chain.
+
+## Node version
+
+Please use Node Version v16.14.0 with the following command:
+
+```bash
+nvm use v16.14.0
+```
+
+After setting Node Version:
+
+```bash
+npm install
+```
+
+## WorldCoin
+
+To use leave a review you need to have a verified worldCoinId.
+
+To simulate your Proof of Person Id when submitting a review please go to https://simulator.worldcoin.org/ and paste the QR code from the WorldCoin modal.
+
+## Gelato relay
+
+To sponsor reviewers gas you should fund the gelato relay at https://relay.gelato.network/apps/
+
+## Description
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
