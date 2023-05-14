@@ -93,7 +93,18 @@ contract Review is ERC2771Context {
         require(success721 && abi.decode(data721, (bool)), "Not ERC721");
 
         (bool success, bytes memory data) = token.call(abi.encodeWithSelector(IERC721.balanceOf.selector, _msgSender()));
-        _checkIsHolder(success, data);
+
+        uint256 chainId;
+
+        // solhint-disable-next-line no-inline-assembly
+        assembly {
+            chainId := chainid()
+        }
+
+        /// Mumbai chain should allow multiple reviews to demo easily
+        if (chainId == 137) {
+            _checkIsHolder(success, data);
+        }
 
         _setReview(token, _msgSender());
 

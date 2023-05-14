@@ -9,6 +9,6 @@ deploy-anvil :; forge script script/${contract}.s.sol:Deploy${contract} --rpc-ur
 # Example on how to run this command: "make deploy-mumbai contract=Review"
 deploy-mumbai :; forge script script/${contract}.s.sol:Deploy${contract} --rpc-url ${MUMBAI_RPC_URL}  --private-key ${PRIVATE_KEY} --broadcast --verify --etherscan-api-key ${POLYGON_API_KEY} -vvvv
 
-deploy-polygon :; forge script script/${contract}.s.sol:Deploy${contract} --rpc-url ${POLYGOON_RPC_URL}  --private-key ${PRIVATE_KEY} --broadcast --verify --etherscan-api-key ${POLYGON_API_KEY} -vvvv
+deploy-polygon :; forge script script/${contract}.s.sol:Deploy${contract} --rpc-url ${POLYGON_RPC_URL}  --private-key ${PRIVATE_KEY} --broadcast --verify --etherscan-api-key ${POLYGON_API_KEY} -vvvv
 
 deploy-all :; make deploy-${network} contract=Review
