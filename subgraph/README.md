@@ -35,9 +35,9 @@ npm run codegen
 npm run test
 ```
 
-## Deploy Your Own - UPDATE ferrodri/transparenza-mumbai in package.json
+## Deploy Your Own - UPDATE subgraph name v(transparenza-mumbai) in package.json
 
-### Authenticate for GraphStudio different from hosted service https://thegraph.com/studio/
+### Authenticate for GraphStudio https://thegraph.com/studio/
 
 ```sh
 graph auth --studio {deployId}
@@ -67,3 +67,7 @@ npm run codegen
 ```sh
 npm run deploy:mumbai
 ```
+
+## Mumbai Deployment
+
+https://api.studio.thegraph.com/query/46766/transparenza-mumbai/v0.0.8
