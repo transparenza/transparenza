@@ -4,6 +4,7 @@ import { STORAGE_API_KEY } from 'config'
 const client = new Web3Storage({ token: STORAGE_API_KEY })
 
 export function createIpfsUrl(cid: string, filename: string) {
-  return `https://${cid}.ipfs.dweb.link/${filename}`
+  const path = filename
+  return new URL(path, `https://${cid}.ipfs.dweb.link`).toString()
 }
 export default client
