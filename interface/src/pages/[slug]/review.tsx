@@ -13,6 +13,7 @@ import { toast } from 'react-hot-toast'
 import { CHAIN_ID } from 'config'
 import useTransparenza from 'hooks/useTransparenza'
 import { defaultAbiCoder as abi } from '@ethersproject/abi'
+import useSafe from 'hooks/useSafe'
 
 interface PageProps {
   entity: Entity
@@ -26,7 +27,9 @@ interface ReviewData {
 
 const CreateReview: NextPage<PageProps> = ({ entity }) => {
   const { data: signer } = useSigner()
+  const { data: safe } = useSafe(signer)
   const transparenza = useTransparenza(signer)
+
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [review, setReview] = useState<ReviewData>({
     title: '',
@@ -128,6 +131,16 @@ const CreateReview: NextPage<PageProps> = ({ entity }) => {
       </Head>
 
       <div className="py-20">
+        <div
+          onClick={async () => {
+            if (safe) {
+              const s = await safe.getContractVersion()
+              console.log(s)
+            }
+          }}
+        >
+          Test
+        </div>
         <div className="container-content flex justify-center">
           <div className="w-full max-w-[720px] border border-neutral-800">
             <IDKitWidget
