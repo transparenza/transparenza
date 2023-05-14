@@ -1,6 +1,7 @@
 ## Install dependencies
+
 ```sh
-make install
+forge install
 ```
 ## Development
 

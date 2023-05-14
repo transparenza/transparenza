@@ -2,8 +2,6 @@
 
 .PHONY: source .env
 
-install :; forge install foundry-rs/forge-std --no-commit && forge install transmissions11/solmate --no-commit && forge install openzeppelin/openzeppelin-contracts --no-commit && forge install https://github.com/gelatodigital/relay-context-contracts --no-commit && forge remappings > remappings.txt
-
 # This is the first private key of account from from the "make anvil" command
 # Example on how to run this command: "make deploy-anvil contract=MockDAI", remember to first run "make anvil"
 deploy-anvil :; forge script script/${contract}.s.sol:Deploy${contract} --rpc-url http://localhost:8545  --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 --broadcast -vvvv
