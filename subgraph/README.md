@@ -70,4 +70,4 @@ npm run deploy:mumbai
 
 ## Mumbai Deployment
 
-https://api.studio.thegraph.com/query/46766/transparenza-mumbai/v0.0.9
+https://api.studio.thegraph.com/query/46766/transparenza-mumbai/v1.0.0

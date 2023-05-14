@@ -23,7 +23,7 @@ make deploy-mumbai contract=Review
 
 ## Mumbai deployment (verified)
 
-https://mumbai.polygonscan.com/address/0x97bd271c60780fee32cdc04300f39fcfcb1e15d3
+https://mumbai.polygonscan.com/address/0x85e8daec6ac680965404bd947c7d2967887fdf23
 
 ## Deploy to Polygon
 
