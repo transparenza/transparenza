@@ -14,6 +14,8 @@ import { CHAIN_ID } from 'config'
 import useTransparenza from 'hooks/useTransparenza'
 import { defaultAbiCoder as abi } from '@ethersproject/abi'
 import useSafe from 'hooks/useSafe'
+import { sponsoredCall } from 'services/gelato'
+import { ethers } from 'ethers'
 
 interface PageProps {
   entity: Entity
@@ -23,6 +25,15 @@ interface ReviewData {
   title: string
   text: string
   rating: number
+}
+
+// todo: delete
+const faveVerification = {
+  merkle_root: '0x2b52cef5e75567d9b9075b2ed16dc3936e54a444e0de6403fb34b325effb3d8a',
+  nullifier_hash: '0x0d3a53cc025c4a5481062f0c52198763a9609c9a9c744fc25fec9231d4c2d219',
+  proof:
+  "0x11dc19c7fa9e4b816beb6f9752e7124f8260a4c083870aa07344ee944777b535230df3e19376e2532af4f36416e552c9e1a1bfe281b791e5f0cc6254fd4503e31aa0fd8095d98ab8652b2429bde22e1247817fad0bf907b7207ccf7e9c33fe44019aaf360ea61bff93eda737318c0d0f391622e7bb98cfee2a56bb428121784f052eadd9380048d60d34009314c05801c9418be40be394178fb64274baf2643d2ff0b098957ef0b7709c4638430b9d98989061b0a52bfe6c1b1c9e6cf122719a150a0f2277aadd641f2bc8d34ed76b2d489b779b870e6ee686989dac53d905bd0d1b3dfb82234ff120b8ab95c7616917c301a04511bde6cb9214c4f71d73946a",
+  credential_type: 'orb'
 }
 
 const CreateReview: NextPage<PageProps> = ({ entity }) => {
@@ -50,7 +61,7 @@ const CreateReview: NextPage<PageProps> = ({ entity }) => {
       console.log('verification', verification)
 
       try {
-        if (!signer) {
+        if (!signer || !transparenza) {
           toast.error('Please connect your wallet.')
           return
         }
@@ -78,7 +89,20 @@ const CreateReview: NextPage<PageProps> = ({ entity }) => {
 
           console.log(txResponse)
         } else if (entity.tokenStandard === 'ERC721') {
-          const tx = await transparenza.commentERC721(
+          // const tx = await transparenza.commentERC721(
+          //   entity.tokenAddress[CHAIN_ID],
+          //   cid,
+          //   verification.merkle_root,
+          //   verification.nullifier_hash,
+          //   unpackedProof
+          // )
+
+          // const txResponse = await tx.wait()
+
+          // console.log(txResponse)
+          const userAddress = await signer.getAddress()
+          const contractAddress = transparenza.address
+          const { data } = await transparenza.populateTransaction.commentERC721(
             entity.tokenAddress[CHAIN_ID],
             cid,
             verification.merkle_root,
@@ -86,9 +110,27 @@ const CreateReview: NextPage<PageProps> = ({ entity }) => {
             unpackedProof
           )
 
-          const txResponse = await tx.wait()
+          if (!data) {
+            toast.error('Something went wrong. Please try again.')
+            return
+          }
+          if (!window.ethereum) {
+            toast.error('Please install Metamask.')
+            return
+          }
 
-          console.log(txResponse)
+          const provider = new ethers.providers.Web3Provider(window.ethereum)
+          const tx = await sponsoredCall(
+            {
+              chainId: CHAIN_ID,
+              target: contractAddress,
+              data: data,
+              user: userAddress
+            },
+            provider
+          )
+
+          console.log(tx)
         } else if (entity.tokenStandard === 'ERC1155') {
           if (!entity.tokenId) {
             toast.error(`Token standard ${entity.tokenStandard} requires a token ID.}`)
@@ -131,16 +173,6 @@ const CreateReview: NextPage<PageProps> = ({ entity }) => {
       </Head>
 
       <div className="py-20">
-        <div
-          onClick={async () => {
-            if (safe) {
-              const s = await safe.getContractVersion()
-              console.log(s)
-            }
-          }}
-        >
-          Test
-        </div>
         <div className="container-content flex justify-center">
           <div className="w-full max-w-[720px] border border-neutral-800">
             <IDKitWidget
@@ -154,8 +186,8 @@ const CreateReview: NextPage<PageProps> = ({ entity }) => {
                 <ReviewForm
                   review={review}
                   setReview={setReview}
-                  onSubmit={() => open()} // todo: uncomment this
-                  // onSubmit={() => onVerification()}
+                  // onSubmit={() => open()} // todo: uncomment
+                  onSubmit={() => onVerification(faveVerification)} // todo: delete
                   isSubmitting={isSubmitting}
                 />
               )}

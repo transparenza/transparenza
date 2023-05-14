@@ -6,3 +6,5 @@ export const INFURA_API_URL: string = process.env.NEXT_PUBLIC_INFURA_API_URL || 
 export const STORAGE_API_KEY = process.env.NEXT_PUBLIC_STORAGE_API_KEY || ''
 export const AIRSTACK_API_KEY = process.env.NEXT_PUBLIC_AIRSTACK_API_KEY || ''
 export const SUBGRAPH_URL = process.env.NEXT_PUBLIC_SUBGRAPH_URL || ''
+export const GELATO_RELAY_API_KEY = process.env.NEXT_PUBLIC_GELATO_RELAY_API_KEY || ''
+export const GELATO_RELAY_API_URL = process.env.NEXT_PUBLIC_GELATO_RELAY_API_URL || ''
