@@ -5,6 +5,7 @@ import AppLayout from 'components/layouts/AppLayout'
 import type { AppProps } from 'next/app'
 import 'services/airstack'
 import 'styles/globals.css'
+import 'styles/rainbowkit.css'
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
