@@ -35,7 +35,7 @@ npm run codegen
 npm run test
 ```
 
-## Deploy Your Own - UPDATE subgraph name v(transparenza-mumbai) in package.json
+## Deploy Your Own - UPDATE subgraph name (transparenza-mumbai) in package.json
 
 ### Authenticate for GraphStudio https://thegraph.com/studio/
 
