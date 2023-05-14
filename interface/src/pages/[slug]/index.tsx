@@ -9,13 +9,18 @@ import Image from 'next/image'
 import useReviewContent from 'hooks/useReviewContent'
 import useReviews from 'hooks/useReviews'
 import Link from 'next/link'
+import { useMemo } from 'react'
+import { buildLensProfileUrl } from 'utils/lens'
+import { buildExplorerAddressLink } from 'utils/chainExplorer'
+import { RiStarFill as IconStar } from 'react-icons/ri'
 
 interface PageProps {
   entity: Entity
 }
 
 const Entity: NextPage<PageProps> = ({ entity }) => {
-  const { data: reviewEvents } = useReviews(entity)
+  const { data: reviewEventss } = useReviews(entity)
+  const reviewEvents = reviewEventss?.filter((rv) => rv.sender === '0x75336b7f786df5647f6b20dc36eab9e27d704894')
 
   return (
     <>
@@ -38,7 +43,7 @@ const Entity: NextPage<PageProps> = ({ entity }) => {
               </div>
               <div>
                 <h1 className="text-8xl font-medium uppercase">{entity.name}</h1>
-                <div className="text-sm font-medium text-gray-500">
+                <div className="text-sm font-medium text-neutral-400">
                   {shortenAddress(entity.tokenAddress[CHAIN_ID])}
                 </div>
               </div>
@@ -50,7 +55,7 @@ const Entity: NextPage<PageProps> = ({ entity }) => {
               Write review
             </Link>
           </div>
-          <div className="mt-20 grid grid-cols-2 gap-12">
+          <div className="mt-20 grid border-collapse grid-cols-2">
             {reviewEvents?.map((reviewEvent, i) => (
               <ReviewItem key={`review_${i}`} reviewEvent={reviewEvent} />
             ))}
@@ -72,16 +77,37 @@ const ReviewItem = ({ reviewEvent }: { reviewEvent: ReviewEvent }) => {
     }
   }`)
 
+  const lensName = useMemo(() => {
+    if (reviewEvent.sender === '0x75336b7f786df5647f6b20dc36eab9e27d704894') {
+      return 'ferrodri.lens'
+    }
+    const lensInfo = socials?.Wallet?.socials?.find(
+      (social: { profileName: string; dappName: string }) => social.dappName === 'lens'
+    )
+
+    return lensInfo?.profileName
+  }, [reviewEvent.sender, socials?.Wallet?.socials])
+
+  const senderUrl = useMemo(() => {
+    return lensName ? buildLensProfileUrl(lensName) : buildExplorerAddressLink(reviewEvent.sender)
+  }, [lensName, reviewEvent.sender])
+
   return (
-    <div>
+    <div className="border-collapse space-y-3 border border-neutral-800 p-8	">
       <div className="flex items-center justify-between">
-        <div className="font-bold">{shortenAddress(reviewEvent.sender)}</div>
-        <div className="flex">
-          {/* <Rating iconsCount={1} /> */}
-          <div>{review?.rating}</div>
+        <div>
+          <Link href={senderUrl} target="_blank" className="font-medium">
+            {lensName ? `${lensName} 🌿` : shortenAddress(reviewEvent.sender)}
+          </Link>
         </div>
+        {review?.rating && (
+          <div className="flex items-center space-x-1.5">
+            <IconStar />
+            <div>{review.rating}.00</div>
+          </div>
+        )}
       </div>
-      <div className="mt-4 text-gray-400">{review?.text}</div>
+      <div className="text-neutral-400">{review?.text}</div>
     </div>
   )
 }
