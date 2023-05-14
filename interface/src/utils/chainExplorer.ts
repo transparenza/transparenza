@@ -17,3 +17,8 @@ export const buildExplorerTxLink = (txHash: string): string => {
   const path = `tx/${txHash}`
   return new URL(path, BASE_URL).toString()
 }
+
+export const buildExplorerAddressLink = (address: string): string => {
+  const path = `address/${address}`
+  return new URL(path, BASE_URL).toString()
+}
