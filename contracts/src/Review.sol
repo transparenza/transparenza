@@ -75,19 +75,7 @@ contract Review is ERC2771Context {
         (bool success, bytes memory data) = token.call(abi.encodeWithSelector(IERC721.balanceOf.selector, _msgSender()));
         _checkIsHolder(success, data);
 
-        uint256 chainId;
-
-        // solhint-disable-next-line no-inline-assembly
-        assembly {
-            chainId := chainid()
-        }
-
-        /// Mumbai chain should allow multiple reviews to demo easily
-        if (chainId == 137) {
-            _setReview(token, _msgSender());
-        } else {
-            accountReviewedToken[token][_msgSender()] = true;
-        }
+        _setReview(token, _msgSender());
 
         _count(_msgSender());
 
@@ -116,13 +104,23 @@ contract Review is ERC2771Context {
     }
 
     function _setReview(address token, address sender) private {
-        require(!accountReviewedToken[token][sender], "Already commented");
+        require(!accountReviewedToken[token][sender] && !_isMumbai(), "Already commented");
         accountReviewedToken[token][sender] = true;
     }
 
     function _setReview1155(address token, uint256 tokenId, address sender) private {
-        require(!accountReviewedERC1155[token][tokenId][sender], "Already commented");
+        /// Mumbai chain should allow multiple reviews to demo easily
+        require(!accountReviewedERC1155[token][tokenId][sender] && !_isMumbai(), "Already commented");
         accountReviewedERC1155[token][tokenId][sender] = true;
+    }
+
+    function _isMumbai() private view returns (bool) {
+        uint256 chainId;
+        // solhint-disable-next-line no-inline-assembly
+        assembly {
+            chainId := chainid()
+        }
+        return chainId == 80001;
     }
 
     function _checkIsHolder(bool success, bytes memory data) private pure {
