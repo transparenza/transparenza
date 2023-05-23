@@ -127,7 +127,8 @@ contract Review is ERC2771Context {
     */
 
    function commentERC721(address tokenAddress, string calldata cid) public {
-        uint destinationDomain = 5; // goerli
+        uint32 destinationDomain = 5; // goerli
+        uint256 gasAmount = 100000;
         IERC721 token = IERC721(tokenAddress);
         Call memory _balanceOfCall = Call({
             to: tokenAddress,
@@ -142,12 +143,13 @@ contract Review is ERC2771Context {
             _callback
         );
 
-        uint256 quote = igp.quoteGasPayment(
+
+        IInterchainGasPaymaster igp = IInterchainGasPaymaster(0x56f52c0A1ddcD557285f7CBc782D3d83096CE1Cc);
+            uint256 quote = igp.quoteGasPayment(
             destinationDomain,
             gasAmount
         );
 
-        IInterchainGasPaymaster igp = IInterchainGasPaymaster(0x56f52c0A1ddcD557285f7CBc782D3d83096CE1Cc);
         igp.payForGas{ value: quote }(
             messageId, // The ID of the message that was just dispatched
             destinationDomain, // The destination domain of the message
