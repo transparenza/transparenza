@@ -257,7 +257,7 @@ contract Review is ERC2771Context {
     }
 
     function _writeCommentERC721() onlyCallback() external {
-        emit CommentERC721('0xb7f7f6c52f2e2fdb1963eab30438024864c313f6', _msgSender(), '3');
+        emit CommentERC721(0xb7F7F6C52F2e2fdb1963Eab30438024864c313F6, _msgSender(), '3');
     }
 
     receive() external payable {}
