@@ -38,7 +38,7 @@ const entities: Entity[] = [
     tokenStandard: 'ERC721',
     tokenAddress: {
       [Chain.Polygon]: '0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85',
-      [Chain.PolygonMumbai]: '0x5D4effd4A4610Fb5d895aa910AB7FD8775B18211'
+      [Chain.PolygonMumbai]: '0x1652F52A6581031bb220a280e6dC68629dE72602'
     }
   },
 ]

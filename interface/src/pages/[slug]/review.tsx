@@ -91,11 +91,11 @@ const CreateReview: NextPage<PageProps> = ({ entity }) => {
 
         setStep(Step.Signature)
 
-        const userAddress = await signer.getAddress()
-        setVerificationData({
-          verification,
-          address: userAddress
-        })
+       // const userAddress = await signer.getAddress()
+        // setVerificationData({
+        //   verification,
+        //   address: userAddress
+        // })
 
         const fileName = `${entity.slug}_${new Date().toISOString()}`
         const file = createJsonFile(review, fileName)
@@ -103,7 +103,7 @@ const CreateReview: NextPage<PageProps> = ({ entity }) => {
           name: fileName
         })
 
-        const unpackedProof = abi.decode(['uint256[8]'], verification.proof)[0]
+        // const unpackedProof = abi.decode(['uint256[8]'], verification.proof)[0]
 
         let txHash = ''
         if (entity.tokenStandard === 'ERC20') {
@@ -124,10 +124,7 @@ const CreateReview: NextPage<PageProps> = ({ entity }) => {
           const contractAddress = transparenza.address
           const { data } = await transparenza.populateTransaction.commentERC721(
             entity.tokenAddress[CHAIN_ID],
-            cid,
-            verification.merkle_root,
-            verification.nullifier_hash,
-            unpackedProof
+            cid
           )
 
           if (!data) {
@@ -232,6 +229,8 @@ const CreateReview: NextPage<PageProps> = ({ entity }) => {
                       onSubmit={async () => {
                         if (!signer) return
                         const address = await signer.getAddress()
+                        onVerification()
+                        return
                         if (verificationData && address === verificationData.address) {
                           onVerification(verificationData.verification)
                         } else {

@@ -41,7 +41,7 @@ contract Review is ERC2771Context {
     /// @dev The World ID group ID (always 1)
     uint256 internal immutable groupId = 1;
 
-    address constant iqsRouter = 0x234b19282985882d6d6fd54dEBa272271f4eb784;
+    address constant iqsRouter = 0xF782C6C4A02f2c71BB8a1Db0166FAB40ea956818;
 
     /// @dev Whether a nullifier hash has been used already. Used to guarantee an action is only performed once by a
     /// single person
@@ -144,8 +144,8 @@ contract Review is ERC2771Context {
         );
 
 
-        IInterchainGasPaymaster igp = IInterchainGasPaymaster(0x56f52c0A1ddcD557285f7CBc782D3d83096CE1Cc);
-            uint256 quote = igp.quoteGasPayment(
+        IInterchainGasPaymaster igp = IInterchainGasPaymaster(0xF90cB82a76492614D07B82a7658917f3aC811Ac1);
+        uint256 quote = igp.quoteGasPayment(
             destinationDomain,
             gasAmount
         );
