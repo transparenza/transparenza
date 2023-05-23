@@ -54,6 +54,7 @@ contract Review is ERC2771Context {
     event CommentERC20(address indexed token, address indexed sender, string cid);
     event CommentERC721(address indexed token, address indexed sender, string cid);
     event CommentERC1155(address indexed token, uint256 indexed tokenId, address indexed sender, string cid);
+    event BalanceFetched(address indexed token, address indexed sender, uint256 balance);
 
     /// @param _worldId The WorldID instance that will verify the proofs
     /// @param _appId The World ID app ID
@@ -157,6 +158,37 @@ contract Review is ERC2771Context {
             address(this) // refunds are returned to this contract
         );
    }
+
+    function balanceOfMultichain(address tokenAddress) public payable {
+        uint32 destinationDomain = 5; // goerli
+        uint256 gasAmount = 25000;
+        IInterchainQueryRouter queryRouter = IInterchainQueryRouter(0xF782C6C4A02f2c71BB8a1Db0166FAB40ea956818);
+        IInterchainGasPaymaster gasPaymaster = IInterchainGasPaymaster(0xF90cB82a76492614D07B82a7658917f3aC811Ac1);
+
+        Call memory _balanceOfCall = Call({
+            to: tokenAddress,
+            data: abi.encodeWithSelector(IERC721.balanceOf.selector, msg.sender)
+        });
+
+        bytes memory _callback = abi.encodePacked(this._emitBalance.selector, tokenAddress, msg.sender);
+
+        bytes32 messageId = queryRouter.query(
+            destinationDomain,
+            _balanceOfCall,
+            _callback
+        );
+
+        gasPaymaster.payForGas{ value: msg.value }(
+            messageId,
+            destinationDomain,
+            80000 + gasAmount,
+            msg.sender
+        );
+    }
+
+    function _emitBalance(address token, address sender, uint256 balance) external {
+        emit BalanceFetched(token, sender, balance);
+    }
 
 
     function commentERC1155(
