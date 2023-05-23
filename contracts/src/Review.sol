@@ -54,6 +54,8 @@ contract Review is ERC2771Context {
     event CommentERC20(address indexed token, address indexed sender, string cid);
     event CommentERC721(address indexed token, address indexed sender, string cid);
     event CommentERC1155(address indexed token, uint256 indexed tokenId, address indexed sender, string cid);
+
+    event NewMessage(bytes32 indexed messageId, address indexed sender);
     event BalanceFetched(address indexed token, address indexed sender, uint256 balance);
 
     /// @param _worldId The WorldID instance that will verify the proofs
@@ -144,7 +146,6 @@ contract Review is ERC2771Context {
             _callback
         );
 
-
         IInterchainGasPaymaster igp = IInterchainGasPaymaster(0xF90cB82a76492614D07B82a7658917f3aC811Ac1);
         uint256 quote = igp.quoteGasPayment(
             destinationDomain,
@@ -166,8 +167,8 @@ contract Review is ERC2771Context {
         IInterchainGasPaymaster gasPaymaster = IInterchainGasPaymaster(0xF90cB82a76492614D07B82a7658917f3aC811Ac1);
 
         Call memory _balanceOfCall = Call({
-            to: tokenAddress,
-            data: abi.encodeWithSelector(IERC721.balanceOf.selector, msg.sender)
+            to: address(tokenAddress),
+            data: abi.encodeCall(IERC721.balanceOf, (msg.sender))
         });
 
         bytes memory _callback = abi.encodePacked(this._emitBalance.selector, tokenAddress, msg.sender);
@@ -177,6 +178,8 @@ contract Review is ERC2771Context {
             _balanceOfCall,
             _callback
         );
+
+        emit NewMessage(messageId, msg.sender);
 
         gasPaymaster.payForGas{ value: msg.value }(
             messageId,
