@@ -13,14 +13,10 @@ import {IERC721} from "openzeppelin-contracts/contracts/token/ERC721/IERC721.sol
 import {IERC1155} from "openzeppelin-contracts/contracts/token/ERC1155/IERC1155.sol";
 import {IERC165} from "forge-std/interfaces/IERC165.sol";
 import {ERC2771Context} from "relay-context-contracts/vendor/ERC2771Context.sol";
+import './constants/Call.sol';
 
 contract Review is ERC2771Context {
     using ByteHasher for bytes;
-
-    struct Call {
-        address to;
-        bytes data;
-    }
 
     /// Token => EOA => hasCommented
     mapping(address => mapping(address => bool)) public accountReviewedToken;
