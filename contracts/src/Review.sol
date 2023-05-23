@@ -5,6 +5,8 @@ pragma solidity =0.8.18;
 
 import {ByteHasher} from "./helpers/ByteHasher.sol";
 import {IWorldID} from "./interfaces/IWorldID.sol";
+import {IInterchainQueryRouter} from './interfaces/IInterchainQueryRouter.sol';
+import {IInterchainGasPaymaster} from './interfaces/IInterchainGasPaymaster.sol';
 
 import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import {IERC721} from "openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
@@ -14,6 +16,11 @@ import {ERC2771Context} from "relay-context-contracts/vendor/ERC2771Context.sol"
 
 contract Review is ERC2771Context {
     using ByteHasher for bytes;
+
+    struct Call {
+        address to;
+        bytes data;
+    }
 
     /// Token => EOA => hasCommented
     mapping(address => mapping(address => bool)) public accountReviewedToken;
@@ -38,6 +45,8 @@ contract Review is ERC2771Context {
     /// @dev The World ID group ID (always 1)
     uint256 internal immutable groupId = 1;
 
+    address constant iqsRouter = 0x234b19282985882d6d6fd54dEBa272271f4eb784;
+
     /// @dev Whether a nullifier hash has been used already. Used to guarantee an action is only performed once by a
     /// single person
     mapping(uint256 => bool) internal nullifierHashes;
@@ -60,6 +69,11 @@ contract Review is ERC2771Context {
         externalNullifier = abi.encodePacked(abi.encodePacked(_appId).hashToField(), _actionId).hashToField();
     }
 
+    modifier onlyCallback() {
+        require(msg.sender == iqsRouter);
+        _;
+    }
+
     function commentERC20(
         address token,
         string calldata cid,
@@ -78,6 +92,7 @@ contract Review is ERC2771Context {
         emit CommentERC20(token, _msgSender(), cid);
     }
 
+    /*
     function commentERC721(
         address token,
         string calldata cid,
@@ -113,6 +128,38 @@ contract Review is ERC2771Context {
 
         emit CommentERC721(token, _msgSender(), cid);
     }
+    */
+
+   function commentERC721(address tokenAddress, string calldata cid) public {
+        uint destinationDomain = 5; // goerli
+        IERC721 token = IERC721(tokenAddress);
+        Call memory _balanceOfCall = Call({
+            to: tokenAddress,
+            data: abi.encodeWithSelector(IERC721.balanceOf.selector, _msgSender())
+        });
+
+        bytes memory _callback = abi.encodePacked(this._writeCommentERC721.selector);
+
+        bytes32 messageId = IInterchainQueryRouter(iqsRouter).query(
+            destinationDomain, // goerli
+            _balanceOfCall,
+            _callback
+        );
+
+        uint256 quote = igp.quoteGasPayment(
+            destinationDomain,
+            gasAmount
+        );
+
+        IInterchainGasPaymaster igp = IInterchainGasPaymaster(0x56f52c0A1ddcD557285f7CBc782D3d83096CE1Cc);
+        igp.payForGas{ value: quote }(
+            messageId, // The ID of the message that was just dispatched
+            destinationDomain, // The destination domain of the message
+            gasAmount,
+            address(this) // refunds are returned to this contract
+        );
+   }
+
 
     function commentERC1155(
         address token,
@@ -210,4 +257,10 @@ contract Review is ERC2771Context {
     function _checkIsHolder(bool success, bytes memory data) private pure {
         require(success && (abi.decode(data, (uint256)) > 0), "Not a holder");
     }
+
+    function _writeCommentERC721() onlyCallback() external {
+        emit CommentERC721('0xb7f7f6c52f2e2fdb1963eab30438024864c313f6', _msgSender(), '3');
+    }
+
+    receive() external payable {}
 }
