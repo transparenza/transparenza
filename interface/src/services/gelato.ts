@@ -1,12 +1,12 @@
+import { Web3Provider } from '@ethersproject/providers'
 import {
-  GelatoRelay,
   CallWithERC2771Request,
+  GelatoRelay,
   RelayResponse,
   TransactionStatusResponse
 } from '@gelatonetwork/relay-sdk'
-import { GELATO_RELAY_API_KEY, GELATO_RELAY_API_URL } from 'config'
-import { Web3Provider } from '@ethersproject/providers'
 import axios from 'axios'
+import { GELATO_RELAY_API_KEY, GELATO_RELAY_API_URL } from 'config'
 
 enum TaskState {
   CheckPending = 'CheckPending',
@@ -30,7 +30,7 @@ export const sponsoredCall = async (request: CallWithERC2771Request, provider: W
 
 const FETCH_INTERVAL = 4000
 const MAX_ATTEMPTS = 60
-export const awaitSponsoredCall = async (relayResponse: RelayResponse) :Promise<TransactionStatusResponse | undefined> => {
+export const awaitSponsoredCall = async (relayResponse: RelayResponse): Promise<TransactionStatusResponse | undefined> => {
   let attempts = 0
   for (let i = 0; i < MAX_ATTEMPTS; i++) {
     console.log('attempt', attempts)

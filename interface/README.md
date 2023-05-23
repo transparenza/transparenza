@@ -18,12 +18,6 @@ After setting Node Version:
 npm install
 ```
 
-## WorldCoin
-
-To use leave a review you need to have a verified worldCoinId.
-
-To simulate your Proof of Person Id when submitting a review please go to https://simulator.worldcoin.org/ and paste the QR code from the WorldCoin modal.
-
 ## Gelato relay
 
 To sponsor reviewers gas you should fund the gelato relay at https://relay.gelato.network/apps/

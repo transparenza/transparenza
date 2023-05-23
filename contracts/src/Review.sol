@@ -104,13 +104,13 @@ contract Review is ERC2771Context {
     }
 
     function _setReview(address token, address sender) private {
-        require(!accountReviewedToken[token][sender] && !_isMumbai(), "Already commented");
+        require(!accountReviewedToken[token][sender] || _isMumbai(), "Already commented");
         accountReviewedToken[token][sender] = true;
     }
 
     function _setReview1155(address token, uint256 tokenId, address sender) private {
         /// Mumbai chain should allow multiple reviews to demo easily
-        require(!accountReviewedERC1155[token][tokenId][sender] && !_isMumbai(), "Already commented");
+        require(!accountReviewedERC1155[token][tokenId][sender] || _isMumbai(), "Already commented");
         accountReviewedERC1155[token][tokenId][sender] = true;
     }
 
